@@ -12,7 +12,7 @@ class TwitterRestService{
         RestResponse restResponse = rest.get(url) { 
             urlVariables params
             contentType "application/json"
-            auth "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA"
+            
         }
 
         if ( restResponse.statusCode.value() == 200 && restResponse.json ) {
