@@ -4,11 +4,8 @@ import grails.converters.JSON
 class TwitterController{
 
 	def twitterService
-	def twitterRestService
-
 
 	def index(){
-		println("test")
 		render view: "index.gsp"
 	}
 	

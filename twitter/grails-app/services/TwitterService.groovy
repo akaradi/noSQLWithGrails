@@ -1,34 +1,38 @@
-import grails.converters.JSON
-import java.util.*
-import java.util.stream.*
+import com.mongodb.BasicDBObject
 
-class TwitterService{
-	def twitterRestService
-	def dbCon
-	
-	def saveTweets(params){
-		def db = dbCon.getDB()
-		def restResult = twitterRestService.fetchTweets(params)
-		if(restResult?.search_metadata?.count>0){
-			restResult?.statuses?.each{tweet ->
-				db.tweet.save(tweet)
-			}	
-		}
-	}
+class TwitterService {
+    def twitterRestService
+    def dbCon
 
-	def getTweets(params){
-		def data = []
-		def db = dbCon.getDB()
-		if (params.search) {
-			def cursor = db.tweet.find()
-	        if(!cursor){
-				saveTweets(params)
-				cursor = db.tweet.find()
-			}
-			data = cursor?.toArray()
-	    }
-		Arrays 
-            .stream(data) 
-            .collect(Collectors.toList())
-	}
+    def saveTweets(params) {
+        def db = dbCon.getDB()
+        def restResult = twitterRestService.fetchTweets(params)
+        if (restResult?.search_metadata?.count > 0) {
+            restResult?.statuses?.each { tweet ->
+                db.tweet.save(tweet)
+            }
+        }
+    }
+
+    def getTweets(params) {
+        def data = []
+        def db = dbCon.getDB()
+        if (params.search) {
+			String filter = """ { "text" : {\$regex : "${params.search}"} }"""
+            BasicDBObject filterObj = BasicDBObject.parse(filter)
+            def cursor = db.tweet.find(filterObj)
+            if (!cursor) {
+                saveTweets(params)
+                cursor = db.tweet.find(filterObj)
+            }
+            data = cursor?.toArray()
+        }
+
+        data.stream().collect({ tweet ->
+            [
+                    text: tweet.text,
+                    name: tweet.user.name
+            ]
+        })
+    }
 }
