@@ -18,7 +18,7 @@ class TwitterService {
         def data = []
         def db = dbCon.getDB()
         if (params.search) {
-			String filter = """ { "text" : {\$regex : "${params.search}"} }"""
+			String filter = """ { "text" : {\$regex : "${params.search}", \$options : "i"} }"""
             BasicDBObject filterObj = BasicDBObject.parse(filter)
             def cursor = db.tweet.find(filterObj)
             if (!cursor) {
